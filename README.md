@@ -6,7 +6,7 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
 [ダウンロードはこちら．](https://github.com/sigma-axis/aviutl2_script_AutoClipping_S/releases)
 
-![使用例](TODO: )
+![使用例](https://github.com/user-attachments/assets/716b4c5e-0af5-4ae6-90e5-cb494a773395)
 
 ##  動作要件
 
@@ -30,7 +30,7 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
 ##  パラメタの説明
 
-![スクリプトの GUI](TODO: )
+![スクリプトの GUI](https://github.com/user-attachments/assets/a366d849-8d63-4b8c-b398-2791b54b79e5)
 
 ### `上余白`, `下余白`, `左余白`, `右余白`
 
@@ -98,7 +98,7 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
 ## 改版履歴
 
-- **v1.00 (for beta3)** (2025-07-??)
+- **v1.00 (for beta3)** (2025-07-27)
 
   - 初版．
 
