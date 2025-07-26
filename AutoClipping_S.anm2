@@ -1,0 +1,219 @@
+--[[
+MIT License
+Copyright (c) 2025 sigma-axis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+https://mit-license.org/
+]]
+--information:AutoClipping_S v1.00 (for beta3) by σ軸
+--label:クリッピング
+--track@pad_u:上余白,-4000,4000,0,1
+--track@pad_d:下余白,-4000,4000,0,1
+--track@pad_l:左余白,-4000,4000,0,1
+--track@pad_r:右余白,-4000,4000,0,1
+--check@enable_u:上除去,1
+--check@enable_d:下除去,1
+--check@enable_l:左除去,1
+--check@enable_r:右除去,1
+--track@thresh:αしきい値,0,100,0,0.01
+--check@move_center:中心の位置を変更,1
+--value@PI:PI,{}
+--[[pixelshader@max_lr:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float span, offset;
+};
+
+float4 max_lr(float4 pos : SV_Position) : SV_Target
+{
+	const int x = int(pos.x), h = int(span), y0 = int(offset);
+	float M = 0;
+	for (int y = 0; y < h; y++)
+		M = max(M, src.Load(int3(x, y + y0, 0)).a);
+	return float4(0.0, 0.0, 0.0, M);
+}
+]]
+--[[pixelshader@max_tb:
+Texture2D src : register(t0);
+cbuffer constant0 : register(b0) {
+	float span;
+};
+
+float4 max_tb(float4 pos : SV_Position) : SV_Target
+{
+	const int y = int(pos.x), w = int(span);
+	float M = 0;
+	for (int x = 0; x < w; x++)
+		M = max(M, src.Load(int3(x, y, 0)).a);
+	return float4(0.0, 0.0, 0.0, M);
+}
+]]
+
+local obj, tonumber, type, math = obj, tonumber, type, math;
+
+-- take parameters.
+--[==[
+	PI = {
+		pad_u: number?,
+		pad_d: number?,
+		pad_l: number?,
+		pad_r: number?,
+		enable_u: boolean|number?,
+		enable_d: boolean|number?,
+		enable_l: boolean|number?,
+		enable_r: boolean|number?,
+		thresh: number?,
+		move_center: boolean|number?,
+	}
+--]==]
+pad_u = tonumber(PI.pad_u) or pad_u;
+pad_d = tonumber(PI.pad_d) or pad_d;
+pad_l = tonumber(PI.pad_l) or pad_l;
+pad_r = tonumber(PI.pad_r) or pad_r;
+if type(PI.enable_u) == "boolean" then enable_u = PI.enable_u;
+elseif type(PI.enable_u) == "number" then enable_u = PI.enable_u ~= 0;
+else enable_u = enable_u ~= 0 end
+if type(PI.enable_d) == "boolean" then enable_d = PI.enable_d;
+elseif type(PI.enable_d) == "number" then enable_d = PI.enable_d ~= 0;
+else enable_d = enable_d ~= 0 end
+if type(PI.enable_l) == "boolean" then enable_l = PI.enable_l;
+elseif type(PI.enable_l) == "number" then enable_l = PI.enable_l ~= 0;
+else enable_l = enable_l ~= 0 end
+if type(PI.enable_r) == "boolean" then enable_r = PI.enable_r;
+elseif type(PI.enable_r) == "number" then enable_r = PI.enable_r ~= 0;
+else enable_r = enable_r ~= 0 end
+thresh = tonumber(PI.thresh) or thresh;
+if type(PI.move_center) == "boolean" then move_center = PI.move_center;
+elseif type(PI.move_center) == "number" then move_center = PI.move_center ~= 0;
+else move_center = move_center ~= 0 end
+
+-- normalize paramters.
+pad_u = math.floor(0.5 + pad_u);
+pad_d = math.floor(0.5 + pad_d);
+pad_l = math.floor(0.5 + pad_l);
+pad_r = math.floor(0.5 + pad_r);
+thresh = math.min(math.max(thresh / 100, 0), 1 - 2 ^ -24);
+
+-- early return for obvious cases.
+local w, h = obj.w, obj.h;
+if not (enable_u or enable_d or enable_l or enable_r) and
+	(pad_u == 0 and pad_d == 0 and pad_l == 0 and pad_r == 0) then return end
+if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then
+	obj.effect("クリッピング", "中心の位置を変更", 1,
+		"上", math.max(-pad_u, 0), "下", math.max(-pad_d, 0),
+		"左", math.max(-pad_l, 0), "右", math.max(-pad_r, 0));
+	return;
+end
+
+-- find boudaries.
+local function resize_canvas(W, H)
+	while W < obj.w or H < obj.h do
+		obj.effect("クリッピング", "中心の位置を変更", 1,
+			"右", math.max(obj.w - W, 0), "下", math.max(obj.h - H, 0));
+	end
+	while W > obj.w or H > obj.h do
+		obj.effect("領域拡張", "右", math.max(W - obj.w, 0), "下", math.max(H - obj.h, 0));
+	end
+end
+if enable_u or enable_d or enable_l or enable_r then
+	-- prepare for shaders.
+	obj.copybuffer("tempbuffer", "object");
+	obj.pixeloption("type", "col");
+	local function get_alpha(x, y)
+		local _, a = obj.getpixel(x, y);
+		return a;
+	end
+	-- NOTE: シェーダー内で thresh と比較して early return するよりも，
+	-- 全ピクセル見て回って最大値を取得するほうが少しだけ速い気がする．
+
+	-- find top and bottom.
+	local u, d;
+	if enable_u or enable_d then
+		resize_canvas(h, 1);
+		obj.pixelshader("max_tb", "object", "tempbuffer", { h });
+		for y = 0, h - 1 do
+			if get_alpha(y, 0) > thresh then u = y; break end
+		end
+		if not u then
+			-- the entire image is dismissed.
+			obj.effect("クリッピング", "中心の位置を変更", 1, "右", h, "下", 1);
+			return;
+		end
+		d = u;
+		for y = h - 1, u + 1, -1 do
+			if get_alpha(y, 0) > thresh then d = y; break end
+		end
+	else u, d = 0, h - 1 end
+
+	-- find left and right.
+	local l, r;
+	if enable_l or enable_r then
+		resize_canvas(w, 1);
+		obj.pixelshader("max_lr", "object", "tempbuffer", { d - u + 1, u });
+		for x = 0, w - 1 do
+			if get_alpha(x, 0) > thresh then l = x; break end
+		end
+		r = l;
+		for x = w - 1, l + 1, -1 do
+			if get_alpha(x, 0) > thresh then r = x; break end
+		end
+	else l, r = 0, w - 1 end
+
+	-- calculate the amount to crop / pad.
+	if enable_u then pad_u = pad_u - u end
+	if enable_d then pad_d = pad_d - (h - (d + 1)) end
+	if enable_l then pad_l = pad_l - l end
+	if enable_r then pad_r = pad_r - (w - (r + 1)) end
+
+	-- restore the image.
+	obj.copybuffer("object", "tempbuffer");
+end
+
+-- crop / pad the image.
+if (w + pad_l <= 0 or w + pad_r <= 0 or h + pad_u <= 0 or h + pad_d <= 0)
+	and w + pad_l + pad_r > 0 and h + pad_u + pad_d > 0 then
+	obj.w, obj.h = obj.getpixel(); -- バグ対処: obj.w と obj.h が obj.copybuffer() で更新されない.
+	resize_canvas(w + pad_l + pad_r, h + pad_u + pad_d);
+	obj.clearbuffer("object");
+else
+	local U, D, L, R = pad_u, pad_d, pad_l, pad_r;
+	while U < 0 or D < 0 or L < 0 or R < 0 do
+		local clip_max = 4000;
+		local u, d, l, r =
+			math.min(math.max(-U, 0), clip_max), math.min(math.max(-D, 0), clip_max),
+			math.min(math.max(-L, 0), clip_max), math.min(math.max(-R, 0), clip_max);
+		U, D, L, R = U + u, D + d, L + l, R + r;
+		obj.effect("クリッピング", "中心の位置を変更", 1,
+			"上", u, "下", d, "左", l, "右", r);
+	end
+	while U > 0 or D > 0 or L > 0 or R > 0 do
+		local extend_max = 4000;
+		local u, d, l, r =
+			math.min(math.max(U, 0), extend_max), math.min(math.max(D, 0), extend_max),
+			math.min(math.max(L, 0), extend_max), math.min(math.max(R, 0), extend_max);
+		U, D, L, R = U - u, D - d, L - l, R - r;
+		obj.effect("領域拡張", "上", u, "下", d, "左", l, "右", r);
+	end
+end
+
+-- adjust the center.
+if not move_center then
+	obj.cx, obj.cy = obj.cx + (pad_l - pad_r) / 2, obj.cy + (pad_u - pad_d) / 2;
+end
