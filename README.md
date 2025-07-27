@@ -20,12 +20,12 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
 導入状況に応じて，以下のフォルダのいずれかに `AutoClipping_S.anm2` をコピーしてください．
 
-- `AviUtl.exe` のあるフォルダに `data` フォルダが **ない** 場合．
+- `aviutl2.exe` のあるフォルダに `data` フォルダが **ない** 場合．
   1.  `%ProgramData%` 内の `aviutl2/Script` フォルダ
       - 通常は `C:/ProgramData/aviutl2/Script` フォルダ
   1.  (1) のフォルダにある任意の名前のフォルダ
 
-- `AviUtl.exe` のあるフォルダに `data` フォルダが **ある** 場合．
+- `aviutl2.exe` のあるフォルダに `data` フォルダが **ある** 場合．
   1.  その `data` フォルダ内の `Script` フォルダ
   1.  (1) のフォルダにある任意の名前のフォルダ
 
