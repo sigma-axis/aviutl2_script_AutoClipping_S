@@ -14,16 +14,20 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta3` で動作確認済み．
+  - `beta4` で動作確認済み．
 
 ##  導入方法
 
-以下のフォルダのいずれかに `AutoClipping_S.anm2` をコピーしてください．
+導入状況に応じて，以下のフォルダのいずれかに `AutoClipping_S.anm2` をコピーしてください．
 
-1.  `%ProgramData%` 内の `aviutl2/Script` フォルダ
-    - 通常は `C:/ProgramData/aviutl2/Script` フォルダ
+- `AviUtl.exe` のあるフォルダに `data` フォルダが **ない** 場合．
+  1.  `%ProgramData%` 内の `aviutl2/Script` フォルダ
+      - 通常は `C:/ProgramData/aviutl2/Script` フォルダ
+  1.  (1) のフォルダにある任意の名前のフォルダ
 
-1.  (1) のフォルダにある任意の名前のフォルダ
+- `AviUtl.exe` のあるフォルダに `data` フォルダが **ある** 場合．
+  1.  その `data` フォルダ内の `Script` フォルダ
+  1.  (1) のフォルダにある任意の名前のフォルダ
 
 初期状態だと「フィルタ効果を追加」メニューの「クリッピング」に AutoClipping_S が追加されています．
 - 「オブジェクト追加メニューの設定」の「ラベル」項目で分類を変更できます．
