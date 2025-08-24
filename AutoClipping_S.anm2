@@ -22,7 +22,7 @@ SOFTWARE.
 
 https://mit-license.org/
 ]]
---information:AutoClipping_S v1.00 (for beta3) by σ軸
+--information:AutoClipping_S v1.10 (for beta8) by σ軸
 --label:クリッピング
 --track@pad_u:上余白,-4000,4000,0,1
 --track@pad_d:下余白,-4000,4000,0,1
@@ -35,33 +35,25 @@ https://mit-license.org/
 --track@thresh:αしきい値,0,100,0,0.01
 --check@move_center:中心の位置を変更,1
 --value@PI:PI,{}
---[[pixelshader@max_lr:
+--[[pixelshader@find_max:
 Texture2D src : register(t0);
 cbuffer constant0 : register(b0) {
-	float span, offset;
+	float width, height;
 };
 
-float4 max_lr(float4 pos : SV_Position) : SV_Target
+float4 find_max(float4 pos : SV_Position) : SV_Target
 {
-	const int x = int(pos.x), h = int(span), y0 = int(offset);
 	float M = 0;
-	for (int y = 0; y < h; y++)
-		M = max(M, src.Load(int3(x, y + y0, 0)).a);
-	return float4(0.0, 0.0, 0.0, M);
-}
-]]
---[[pixelshader@max_tb:
-Texture2D src : register(t0);
-cbuffer constant0 : register(b0) {
-	float span;
-};
-
-float4 max_tb(float4 pos : SV_Position) : SV_Target
-{
-	const int y = int(pos.x), w = int(span);
-	float M = 0;
-	for (int x = 0; x < w; x++)
-		M = max(M, src.Load(int3(x, y, 0)).a);
+	[branch] if (pos.x < width) {
+		const int h = int(height), x = int(pos.x);
+		for (int y = 0; y < h; y++)
+			M = max(M, src.Load(int3(x, y, 0)).a);
+	}
+	else {
+		const int w = int(width), y = int(pos.x) - w;
+		for (int x = 0; x < w; x++)
+			M = max(M, src.Load(int3(x, y, 0)).a);
+	}
 	return float4(0.0, 0.0, 0.0, M);
 }
 ]]
@@ -142,39 +134,38 @@ if enable_u or enable_d or enable_l or enable_r then
 	end
 	-- NOTE: シェーダー内で thresh と比較して early return するよりも，
 	-- 全ピクセル見て回って最大値を取得するほうが少しだけ速い気がする．
-
-	-- find top and bottom.
-	local u, d;
-	if enable_u or enable_d then
-		resize_canvas(h, 1);
-		obj.pixelshader("max_tb", "object", "tempbuffer", { h });
-		for y = 0, h - 1 do
-			if get_alpha(y, 0) > thresh then u = y; break end
-		end
-		if not u then
-			-- the entire image is dismissed.
-			obj.effect("クリッピング", "中心の位置を変更", 1, "右", h, "下", 1);
-			return;
-		end
-		d = u;
-		for y = h - 1, u + 1, -1 do
-			if get_alpha(y, 0) > thresh then d = y; break end
-		end
-	else u, d = 0, h - 1 end
+	resize_canvas(w + h, 1);
+	obj.pixelshader("find_max", "object", "tempbuffer", { w, h });
+	obj.pixeloption("get", "object"); -- 能動的なキャッシュ破棄も兼ねて呼び出し．
 
 	-- find left and right.
 	local l, r;
 	if enable_l or enable_r then
-		resize_canvas(w, 1);
-		obj.pixelshader("max_lr", "object", "tempbuffer", { d - u + 1, u });
 		for x = 0, w - 1 do
 			if get_alpha(x, 0) > thresh then l = x; break end
+		end
+		if not l then
+			-- the entire image is dismissed.
+			obj.effect("クリッピング", "中心の位置を変更", 1, "右", w + h, "下", 1);
+			return;
 		end
 		r = l;
 		for x = w - 1, l + 1, -1 do
 			if get_alpha(x, 0) > thresh then r = x; break end
 		end
 	else l, r = 0, w - 1 end
+
+	-- find top and bottom.
+	local u, d;
+	if enable_u or enable_d then
+		for y = 0, h - 1 do
+			if get_alpha(w + y, 0) > thresh then u = y; break end
+		end
+		d = u;
+		for y = h - 1, u + 1, -1 do
+			if get_alpha(w + y, 0) > thresh then d = y; break end
+		end
+	else u, d = 0, h - 1 end
 
 	-- calculate the amount to crop / pad.
 	if enable_u then pad_u = pad_u - u end
@@ -189,7 +180,6 @@ end
 -- crop / pad the image.
 if (w + pad_l <= 0 or w + pad_r <= 0 or h + pad_u <= 0 or h + pad_d <= 0)
 	and w + pad_l + pad_r > 0 and h + pad_u + pad_d > 0 then
-	obj.w, obj.h = obj.getpixel(); -- バグ対処: obj.w と obj.h が obj.copybuffer() で更新されない.
 	resize_canvas(w + pad_l + pad_r, h + pad_u + pad_d);
 	obj.clearbuffer("object");
 else

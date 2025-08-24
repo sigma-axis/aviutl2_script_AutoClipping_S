@@ -14,7 +14,7 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta4` で動作確認済み．
+  - `beta8` で動作確認済み．
 
 ##  導入方法
 
@@ -101,6 +101,12 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
 
 ## 改版履歴
+
+- **v1.10 (for beta8)** (2025-08-24)
+
+  - 不透明ピクセルの検索手順を変更．
+
+  - `beta8` での動作確認，不要になったバグ対処用コードの削除．
 
 - **v1.00 (for beta3)** (2025-07-27)
 
