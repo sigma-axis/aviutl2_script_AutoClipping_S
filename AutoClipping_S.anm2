@@ -22,7 +22,7 @@ SOFTWARE.
 
 https://mit-license.org/
 ]]
---information:AutoClipping_S v1.10 (for beta8) by σ軸
+--information:AutoClipping_S v1.11 (for beta12) by σ軸
 --label:クリッピング
 --track@pad_u:上余白,-4000,4000,0,1
 --track@pad_d:下余白,-4000,4000,0,1
@@ -137,6 +137,11 @@ if enable_u or enable_d or enable_l or enable_r then
 	resize_canvas(w + h, 1);
 	obj.pixelshader("find_max", "object", "tempbuffer", { w, h });
 	obj.pixeloption("get", "object"); -- 能動的なキャッシュ破棄も兼ねて呼び出し．
+	local function dismiss()
+		-- the entire image is dismissed.
+		obj.effect("クリッピング", "中心の位置を変更", 1, "下", 1);
+		-- `"右", w + h` を指定すると無効化してくれない．
+	end
 
 	-- find left and right.
 	local l, r;
@@ -144,11 +149,7 @@ if enable_u or enable_d or enable_l or enable_r then
 		for x = 0, w - 1 do
 			if get_alpha(x, 0) > thresh then l = x; break end
 		end
-		if not l then
-			-- the entire image is dismissed.
-			obj.effect("クリッピング", "中心の位置を変更", 1, "右", w + h, "下", 1);
-			return;
-		end
+		if not l then return dismiss() end
 		r = l;
 		for x = w - 1, l + 1, -1 do
 			if get_alpha(x, 0) > thresh then r = x; break end
@@ -161,6 +162,7 @@ if enable_u or enable_d or enable_l or enable_r then
 		for y = 0, h - 1 do
 			if get_alpha(w + y, 0) > thresh then u = y; break end
 		end
+		if not u then return dismiss() end
 		d = u;
 		for y = h - 1, u + 1, -1 do
 			if get_alpha(w + y, 0) > thresh then d = y; break end

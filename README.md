@@ -102,6 +102,12 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
 ## 改版履歴
 
+- **v1.11 (for beta12)** (2025-09-27)
+
+  - 完全透明な画像に対して，ゴミ画像が残ったりエラーが発生していたのを修正．
+
+  - `beta12` での動作確認．
+
 - **v1.10 (for beta8)** (2025-08-24)
 
   - 不透明ピクセルの検索手順を変更．
