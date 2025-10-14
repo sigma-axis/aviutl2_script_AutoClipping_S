@@ -14,7 +14,7 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta8` で動作確認済み．
+  - `beta15` で動作確認済み．
 
 ##  導入方法
 
@@ -101,6 +101,14 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
 
 ## 改版履歴
+
+- **v1.12 (for beta15)** (2025-10-14)
+
+  - ピクセルの不透明度を 1 / 255 刻みでしか判定できていなかったのを修正．
+
+  - AviUtl2 本体の更新に伴って手順変更・高速化．
+
+  - `beta15` での動作確認．
 
 - **v1.11 (for beta12)** (2025-09-27)
 

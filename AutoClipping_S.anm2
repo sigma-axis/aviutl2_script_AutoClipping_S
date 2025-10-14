@@ -22,7 +22,7 @@ SOFTWARE.
 
 https://mit-license.org/
 ]]
---information:AutoClipping_S v1.11 (for beta12) by σ軸
+--information:AutoClipping_S v1.12 (for beta15) by σ軸
 --label:クリッピング
 --track@pad_u:上余白,-4000,4000,0,1
 --track@pad_d:下余白,-4000,4000,0,1
@@ -38,7 +38,7 @@ https://mit-license.org/
 --[[pixelshader@find_max:
 Texture2D src : register(t0);
 cbuffer constant0 : register(b0) {
-	float width, height;
+	float width, height, thresh;
 };
 
 float4 find_max(float4 pos : SV_Position) : SV_Target
@@ -54,11 +54,11 @@ float4 find_max(float4 pos : SV_Position) : SV_Target
 		for (int x = 0; x < w; x++)
 			M = max(M, src.Load(int3(x, y, 0)).a);
 	}
-	return float4(0.0, 0.0, 0.0, M);
+	return float4(0.0, 0.0, 0.0, thresh < M ? 1 : 0);
 }
 ]]
 
-local obj, tonumber, type, math = obj, tonumber, type, math;
+local obj, math, tonumber, type, ffi = obj, math, tonumber, type, require("ffi");
 
 -- take parameters.
 --[==[
@@ -105,67 +105,47 @@ thresh = math.min(math.max(thresh / 100, 0), 1 - 2 ^ -24);
 
 -- early return for obvious cases.
 local w, h = obj.w, obj.h;
+local function dismiss()
+	-- the entire image is dismissed.
+	obj.effect("クリッピング", "中心の位置を変更", 1, "下", h);
+end
 if not (enable_u or enable_d or enable_l or enable_r) and
 	(pad_u == 0 and pad_d == 0 and pad_l == 0 and pad_r == 0) then return end
-if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then
-	obj.effect("クリッピング", "中心の位置を変更", 1,
-		"上", math.max(-pad_u, 0), "下", math.max(-pad_d, 0),
-		"左", math.max(-pad_l, 0), "右", math.max(-pad_r, 0));
-	return;
-end
+if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then return dismiss() end
 
 -- find boudaries.
-local function resize_canvas(W, H)
-	while W < obj.w or H < obj.h do
-		obj.effect("クリッピング", "中心の位置を変更", 1,
-			"右", math.max(obj.w - W, 0), "下", math.max(obj.h - H, 0));
-	end
-	while W > obj.w or H > obj.h do
-		obj.effect("領域拡張", "右", math.max(W - obj.w, 0), "下", math.max(H - obj.h, 0));
-	end
-end
 if enable_u or enable_d or enable_l or enable_r then
 	-- prepare for shaders.
-	obj.copybuffer("tempbuffer", "object");
-	obj.pixeloption("type", "col");
-	local function get_alpha(x, y)
-		local _, a = obj.getpixel(x, y);
-		return a;
-	end
-	-- NOTE: シェーダー内で thresh と比較して early return するよりも，
-	-- 全ピクセル見て回って最大値を取得するほうが少しだけ速い気がする．
-	resize_canvas(w + h, 1);
-	obj.pixelshader("find_max", "object", "tempbuffer", { w, h });
-	obj.pixeloption("get", "object"); -- 能動的なキャッシュ破棄も兼ねて呼び出し．
-	local function dismiss()
-		-- the entire image is dismissed.
-		obj.effect("クリッピング", "中心の位置を変更", 1, "下", 1);
-		-- `"右", w + h` を指定すると無効化してくれない．
-	end
+	-- NOTE: getpixel(x, y, "col") で返されるアルファ値は 1 / 255 刻み．
+	obj.setoption("drawtarget", "tempbuffer", w + h, 1);
+	obj.pixelshader("find_max", "tempbuffer", "object", { w, h, thresh });
+	local data = obj.getpixeldata("tempbuffer");
+	local ptr = ffi.cast("uint8_t*", data) + 3;
 
 	-- find left and right.
 	local l, r;
 	if enable_l or enable_r then
 		for x = 0, w - 1 do
-			if get_alpha(x, 0) > thresh then l = x; break end
+			if ptr[4 * x] > 0 then l = x; break end
 		end
 		if not l then return dismiss() end
 		r = l;
 		for x = w - 1, l + 1, -1 do
-			if get_alpha(x, 0) > thresh then r = x; break end
+			if ptr[4 * x] > 0 then r = x; break end
 		end
 	else l, r = 0, w - 1 end
 
 	-- find top and bottom.
 	local u, d;
 	if enable_u or enable_d then
+		ptr = ptr + 4 * w
 		for y = 0, h - 1 do
-			if get_alpha(w + y, 0) > thresh then u = y; break end
+			if ptr[4 * y] > 0 then u = y; break end
 		end
 		if not u then return dismiss() end
 		d = u;
 		for y = h - 1, u + 1, -1 do
-			if get_alpha(w + y, 0) > thresh then d = y; break end
+			if ptr[4 * y] > 0 then d = y; break end
 		end
 	else u, d = 0, h - 1 end
 
@@ -174,16 +154,13 @@ if enable_u or enable_d or enable_l or enable_r then
 	if enable_d then pad_d = pad_d - (h - (d + 1)) end
 	if enable_l then pad_l = pad_l - l end
 	if enable_r then pad_r = pad_r - (w - (r + 1)) end
-
-	-- restore the image.
-	obj.copybuffer("object", "tempbuffer");
 end
 
 -- crop / pad the image.
-if (w + pad_l <= 0 or w + pad_r <= 0 or h + pad_u <= 0 or h + pad_d <= 0)
-	and w + pad_l + pad_r > 0 and h + pad_u + pad_d > 0 then
-	resize_canvas(w + pad_l + pad_r, h + pad_u + pad_d);
-	obj.clearbuffer("object");
+if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then return dismiss();
+elseif w + pad_l <= 0 or w + pad_r <= 0 or h + pad_u <= 0 or h + pad_d <= 0 then
+	obj.setoption("drawtarget", "tempbuffer", w + pad_l + pad_r, h + pad_u + pad_d);
+	obj.copybuffer("object", "tempbuffer");
 else
 	local U, D, L, R = pad_u, pad_d, pad_l, pad_r;
 	while U < 0 or D < 0 or L < 0 or R < 0 do
