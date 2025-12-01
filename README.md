@@ -14,7 +14,7 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta15` で動作確認済み．
+  - `beta22` で動作確認済み．
 
 ##  導入方法
 
@@ -34,7 +34,7 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
 ##  パラメタの説明
 
-![スクリプトの GUI](https://github.com/user-attachments/assets/a366d849-8d63-4b8c-b398-2791b54b79e5)
+![スクリプトの GUI (旧版 v1.12)](https://github.com/user-attachments/assets/a366d849-8d63-4b8c-b398-2791b54b79e5)
 
 ### `上余白`, `下余白`, `左余白`, `右余白`
 
@@ -101,6 +101,12 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
 
 ## 改版履歴
+
+- **v1.13 (for beta22)** (2025-12-01)
+
+  - 設定項目を並び替え/グループ化して整理．
+
+  - `beta22` での動作確認．
 
 - **v1.12 (for beta15)** (2025-10-14)
 

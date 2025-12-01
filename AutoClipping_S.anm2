@@ -22,18 +22,21 @@ SOFTWARE.
 
 https://mit-license.org/
 ]]
---information:AutoClipping_S v1.12 (for beta15) by σ軸
+--information:AutoClipping_S v1.13 (for beta22) by σ軸
 --label:クリッピング
+--track@thresh:αしきい値,0,100,0,0.01
+--check@move_center:中心の位置を変更,1
+--group:余白,false
 --track@pad_u:上余白,-4000,4000,0,1
 --track@pad_d:下余白,-4000,4000,0,1
 --track@pad_l:左余白,-4000,4000,0,1
 --track@pad_r:右余白,-4000,4000,0,1
+--group:有効無効,false
 --check@enable_u:上除去,1
 --check@enable_d:下除去,1
 --check@enable_l:左除去,1
 --check@enable_r:右除去,1
---track@thresh:αしきい値,0,100,0,0.01
---check@move_center:中心の位置を変更,1
+--group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@find_max:
 Texture2D src : register(t0);
