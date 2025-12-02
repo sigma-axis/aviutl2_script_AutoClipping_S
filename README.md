@@ -34,7 +34,7 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
 ##  パラメタの説明
 
-![スクリプトの GUI (旧版 v1.12)](https://github.com/user-attachments/assets/a366d849-8d63-4b8c-b398-2791b54b79e5)
+<img width="500" height="528" alt="スクリプトの GUI" src="https://github.com/user-attachments/assets/1b57c78f-54d0-4f4c-911b-9d707bce45e5" />
 
 ### `上余白`, `下余白`, `左余白`, `右余白`
 
