@@ -75,16 +75,16 @@ Although, usage documentations for this script in languages other than Japanese 
 
 ```lua
 {
-  pad_u = pad_u, -- number 型で "上余白" の項目を上書き，または nil.
-  pad_d = pad_d, -- number 型で "下余白" の項目を上書き，または nil.
-  pad_l = pad_l, -- number 型で "左余白" の項目を上書き，または nil.
-  pad_r = pad_r, -- number 型で "右余白" の項目を上書き，または nil.
-  enable_u = enable_u, -- boolean 型で "上除去" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
-  enable_d = enable_d, -- boolean 型で "下除去" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
-  enable_l = enable_l, -- boolean 型で "左除去" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
-  enable_r = enable_r, -- boolean 型で "右除去" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
-  thresh = thresh, -- number 型で "αしきい値" の項目を上書き，または nil.
-  move_center = move_center, -- boolean 型で "中心の位置を変更" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
+  pad_u = num,        -- number 型で "上余白" の項目を上書き，または nil.
+  pad_d = num,        -- number 型で "下余白" の項目を上書き，または nil.
+  pad_l = num,        -- number 型で "左余白" の項目を上書き，または nil.
+  pad_r = num,        -- number 型で "右余白" の項目を上書き，または nil.
+  enable_u = bool,    -- boolean 型で "上除去" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
+  enable_d = bool,    -- boolean 型で "下除去" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
+  enable_l = bool,    -- boolean 型で "左除去" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
+  enable_r = bool,    -- boolean 型で "右除去" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
+  thresh = num,       -- number 型で "αしきい値" の項目を上書き，または nil.
+  move_center = bool, -- boolean 型で "中心の位置を変更" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
 }
 ```
 - テキストボックスには冒頭末尾の波括弧 (`{}`) を省略して記述してください．
