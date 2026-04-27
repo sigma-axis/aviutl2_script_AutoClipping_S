@@ -101,6 +101,7 @@ Although, usage documentations for this script / plugin in languages other than 
 
 - **v1.14 (for beta43)** (2026-??-??)
 
+  - 画像の幅と高さの和が 16384 ピクセルを超えていた場合正しくなかったのを修正．
   - パラメタのマウス操作倍率を設定．
   - コード整理．
 

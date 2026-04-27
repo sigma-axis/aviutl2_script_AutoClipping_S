@@ -1,4 +1,4 @@
--- under development for v1.14 (for beta43) r1
+-- under development for v1.14 (for beta43) r2
 --[[
 MIT License
 Copyright (c) 2025 sigma-axis
@@ -26,7 +26,7 @@ https://mit-license.org/
 --information:AutoClipping_S v1.13 (for beta22) by σ軸
 --label:クリッピング
 --track@thresh:αしきい値,0,100,0,0.01
---check@move_center:中心の位置を変更,1
+--check@move_center:中心の位置を変更,false
 --group:余白,false
 --track@pad_u:上余白,-4000,4000,0,1,,0.05
 --track@pad_d:下余白,-4000,4000,0,1,,0.05
@@ -44,17 +44,19 @@ Texture2D src : register(t0);
 cbuffer constant0 : register(b0) {
 	float width, height, thresh;
 };
+static const int w = int(width), h = int(height), stride = (w + h + 1) >> 1;
 
 float4 find_max(float4 pos : SV_Position) : SV_Target
 {
 	float M = 0;
-	[branch] if (pos.x < width) {
-		const int h = int(height), x = int(pos.x);
+	const int i = int(pos.x) + int(pos.y) * stride;
+	[branch] if (i < width) {
+		const int x = i;
 		for (int y = 0; y < h; y++)
 			M = max(M, src.Load(int3(x, y, 0)).a);
 	}
 	else {
-		const int w = int(width), y = int(pos.x) - w;
+		const int y = i - w;
 		for (int x = 0; x < w; x++)
 			M = max(M, src.Load(int3(x, y, 0)).a);
 	}
@@ -115,7 +117,10 @@ if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then return dismiss() end
 if enable_u or enable_d or enable_l or enable_r then
 	-- prepare for shaders.
 	-- NOTE: getpixel(x, y, "col") で返されるアルファ値は 1 / 255 刻み．
-	obj.clearbuffer("tempbuffer", w + h, 1);
+	local image_max = 2 ^ 14; -- obj.getinfo("image_max");
+	obj.clearbuffer("tempbuffer",
+		w + h > image_max and math.ceil((w + h) / 2) or (w + h),
+		w + h > image_max and 2 or 1);
 	obj.pixelshader("find_max", "tempbuffer", "object", { w, h, thresh });
 	local data = obj.getpixeldata("tempbuffer");
 	local ptr = ffi.cast("uint8_t*", data) + 3;
