@@ -1,0 +1,7 @@
+# AutoClipping_S AviUtl ExEdit2 余白除去スクリプト
+
+オブジェクトの不透明ピクセルを検索して，最小サイズなるよう上下左右端をクリッピングする AviUtl ExEdit 2 用のスクリプトです．
+
+公開ページ:
+https://github.com/sigma-axis/aviutl2_script_AutoClipping_S
+
