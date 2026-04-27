@@ -1,4 +1,4 @@
-# AutoClipping_S AviUtl ExEdit2 スクリプト
+# AutoClipping_S AviUtl ExEdit2 余白除去スクリプト
 
 オブジェクトの不透明ピクセルを検索して，最小サイズなるよう上下左右端をクリッピングする AviUtl ExEdit 2 用のスクリプトです．
 
@@ -14,56 +14,46 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta22` で動作確認済み．
+  - `beta43` で動作確認済み．
 
 ##  導入方法
 
-導入状況に応じて，以下のフォルダのいずれかに `AutoClipping_S.anm2` をコピーしてください．
-
-- `aviutl2.exe` のあるフォルダに `data` フォルダが **ない** 場合．
-  1.  `%ProgramData%` 内の `aviutl2/Script` フォルダ
-      - 通常は `C:/ProgramData/aviutl2/Script` フォルダ
-  1.  (1) のフォルダにある任意の名前のフォルダ
-
-- `aviutl2.exe` のあるフォルダに `data` フォルダが **ある** 場合．
-  1.  その `data` フォルダ内の `Script` フォルダ
-  1.  (1) のフォルダにある任意の名前のフォルダ
+ダウンロードした `aviutl2_script_AutoClipping_S-v*.**.au2pkg.zip` を AviUtl2 のウィンドウにドラッグ & ドロップしてください．
 
 初期状態だと「フィルタ効果を追加」メニューの「クリッピング」に AutoClipping_S が追加されています．
 - 「オブジェクト追加メニューの設定」の「ラベル」項目で分類を変更できます．
 
 ### For non-Japanese speaking users
 
-You may be able to find language translation file for this script from [this repository](https://github.com/sigma-axis/aviutl2_translations_sigma-axis). 
-Translation files enable names and parameters of the scripts / filters to be displayed in other languages.
+You may be able to find language translation file for this script / plugin from [this repository](https://github.com/sigma-axis/aviutl2_translations_sigma-axis).
 
-Although, usage documentations for this script in languages other than Japanese are not available now.
+Translation files enable names, parameters and commands of the scripts / plugins to be displayed in other languages.
+
+Although, usage documentations for this script / plugin in languages other than Japanese are not available now.
 
 ##  パラメタの説明
 
-<img width="500" height="528" alt="スクリプトの GUI" src="https://github.com/user-attachments/assets/1b57c78f-54d0-4f4c-911b-9d707bce45e5" />
-
-### `上余白`, `下余白`, `左余白`, `右余白`
+### 上余白 / 下余白 / 左余白 / 右余白
 
 上下左右それぞれの余白幅を指定します．負値を指定するとさらにクリッピングします．
 
-全てピクセル単位で最小値は `-4000`, 最大値は `4000`, 初期値は `0`.
+全てピクセル単位で最小値は -4000, 最大値は 4000, 初期値は 0.
 
-### `上除去`, `下除去`, `左除去`, `右除去`
+### 上除去 / 下除去 / 左除去 / 右除去
 
 上下左右それぞれで，透明ピクセルを除去するかどうかを個別に指定します．
 
 初期値は全て ON.
 
-### `αしきい値`
+### αしきい値
 
 各ピクセルを「不透明」と判断する，アルファ値のしきい値です．このしきい値以下のピクセルは「透明」，しきい値を超えるピクセルは「不透明」とみなされます．
 
-% 単位で最小値は `0.00`, 最大値は `100.00`, 初期値は `0.00`.
+% 単位で最小値は 0, 最大値は 100, 初期値は 0.
 
-- `100.00` を指定しても，アルファ値 100% のピクセルは「不透明」とみなされます．
+- 100 を指定しても，アルファ値 100% のピクセルは「不透明」とみなされます．
 
-### `中心の位置を変更`
+### 中心の位置を変更
 
 拡張編集標準の「クリッピング」の「中心の位置を変更」と同様です．チェックを入れると見た目の回転中心が，フィルタ効果適用前と比べて移動します．
 
@@ -92,7 +82,7 @@ Although, usage documentations for this script in languages other than Japanese 
 
 ##  TIPS
 
-1.  [`上除去`, `下除去`, `左除去`, `右除去`](#上除去-下除去-左除去-右除去) を全て OFF にすれば「クリッピング」と「領域拡張」の両方を組み合わせたような，上位互換のフィルタ効果として使用できます．ただし...
+1.  [「上除去」「下除去」「左除去」「右除去」](#上除去--下除去--左除去--右除去) を全て OFF にすれば「クリッピング」と「領域拡張」の両方を組み合わせたような，上位互換のフィルタ効果として使用できます．ただし...
 
     - 「クリッピング」のアンカー操作に相当することはできません．
     - 「領域拡張」の「塗りつぶし」に相当する機能はありません．
@@ -107,7 +97,25 @@ Although, usage documentations for this script in languages other than Japanese 
   実装手順もコードも元のものとは全く異なりますが，根本的な設計は同じです．礎となったスクリプトを開発してくださった Mr-Ojii 様には改めて感謝申し上げます．
 
 
-## 改版履歴
+##  次の改版予定
+
+- **v1.14 (for beta43)** (2026-??-??)
+
+  - パラメタのマウス操作倍率を設定．
+  - コード整理．
+
+  - 配布形式を `.au2pkg.zip` (AviUtl2 のパッケージ形式) に変更．
+    - **以前のバージョンから更新する際は，以前の導入時にコピーしたファイルを一度削除してから導入してください．**
+
+      同名ファイルが複数フォルダに分散して重複して認識されないようにするためで，次のファイルが削除対象です:
+
+      1.  `AutoClipping_S.anm2`
+
+      スクリプトフォルダ，またはその 1 階層下のサブフォルダ内に配置されています．
+
+  - `beta43` での動作確認．
+
+##  改版履歴
 
 - **v1.13 (for beta22)** (2025-12-01)
 
@@ -140,7 +148,7 @@ Although, usage documentations for this script in languages other than Japanese 
   - 初版．
 
 
-## ライセンス
+##  ライセンス
 
 このプログラムの利用・改変・再頒布等に関しては MIT ライセンスに従うものとします．
 
@@ -148,7 +156,7 @@ Although, usage documentations for this script in languages other than Japanese 
 
 The MIT License (MIT)
 
-Copyright (C) 2025 sigma-axis
+Copyright (C) 2025-2026 sigma-axis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -159,7 +167,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 https://mit-license.org/
 
 
-#  連絡・バグ報告
+# 連絡・バグ報告
 
 - GitHub: https://github.com/sigma-axis
 - Twitter: https://x.com/sigma_axis
