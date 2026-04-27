@@ -6,7 +6,7 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
 [ダウンロードはこちら．](https://github.com/sigma-axis/aviutl2_script_AutoClipping_S/releases)
 
-![使用例](https://github.com/user-attachments/assets/716b4c5e-0af5-4ae6-90e5-cb494a773395)
+![使用例](https://github.com/user-attachments/assets/d57d96b5-ba4f-4f41-91f4-bf0ee04eacbd)
 
 ##  動作要件
 
