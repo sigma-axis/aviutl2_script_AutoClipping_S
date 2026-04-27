@@ -1,4 +1,3 @@
--- under development for v1.14 (for beta43) r2
 --[[
 MIT License
 Copyright (c) 2025 sigma-axis
@@ -23,8 +22,9 @@ SOFTWARE.
 
 https://mit-license.org/
 ]]
---information:AutoClipping_S v1.13 (for beta22) by σ軸
+--information:AutoClipping_S v1.14 (for beta43a) by σ軸
 --label:クリッピング
+--require:2003801
 --track@thresh:αしきい値,0,100,0,0.01
 --check@move_center:中心の位置を変更,false
 --group:余白,false
