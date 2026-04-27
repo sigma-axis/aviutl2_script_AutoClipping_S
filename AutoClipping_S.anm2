@@ -1,3 +1,4 @@
+-- under development for v1.14 (for beta43) r1
 --[[
 MIT License
 Copyright (c) 2025 sigma-axis
@@ -27,15 +28,15 @@ https://mit-license.org/
 --track@thresh:αしきい値,0,100,0,0.01
 --check@move_center:中心の位置を変更,1
 --group:余白,false
---track@pad_u:上余白,-4000,4000,0,1
---track@pad_d:下余白,-4000,4000,0,1
---track@pad_l:左余白,-4000,4000,0,1
---track@pad_r:右余白,-4000,4000,0,1
+--track@pad_u:上余白,-4000,4000,0,1,,0.05
+--track@pad_d:下余白,-4000,4000,0,1,,0.05
+--track@pad_l:左余白,-4000,4000,0,1,,0.05
+--track@pad_r:右余白,-4000,4000,0,1,,0.05
 --group:有効無効,false
---check@enable_u:上除去,1
---check@enable_d:下除去,1
---check@enable_l:左除去,1
---check@enable_r:右除去,1
+--check@enable_u:上除去,true
+--check@enable_d:下除去,true
+--check@enable_l:左除去,true
+--check@enable_r:右除去,true
 --group:その他,false
 --value@PI:PI,{}
 --[[pixelshader@find_max:
@@ -60,7 +61,6 @@ float4 find_max(float4 pos : SV_Position) : SV_Target
 	return float4(0.0, 0.0, 0.0, thresh < M ? 1 : 0);
 }
 ]]
-
 local obj, math, tonumber, type, ffi = obj, math, tonumber, type, require("ffi");
 
 -- take parameters.
@@ -70,34 +70,29 @@ local obj, math, tonumber, type, ffi = obj, math, tonumber, type, require("ffi")
 		pad_d: number?,
 		pad_l: number?,
 		pad_r: number?,
-		enable_u: boolean|number?,
-		enable_d: boolean|number?,
-		enable_l: boolean|number?,
-		enable_r: boolean|number?,
+		enable_u: boolean|number|nil,
+		enable_d: boolean|number|nil,
+		enable_l: boolean|number|nil,
+		enable_r: boolean|number|nil,
 		thresh: number?,
-		move_center: boolean|number?,
+		move_center: boolean|number|nil,
 	}
 --]==]
+local function as_bool(t, v)
+	if type(t) == "boolean" then return t;
+	elseif type(t) == "number" then return t ~= 0;
+	else return v end
+end
 pad_u = tonumber(PI.pad_u) or pad_u;
 pad_d = tonumber(PI.pad_d) or pad_d;
 pad_l = tonumber(PI.pad_l) or pad_l;
 pad_r = tonumber(PI.pad_r) or pad_r;
-if type(PI.enable_u) == "boolean" then enable_u = PI.enable_u;
-elseif type(PI.enable_u) == "number" then enable_u = PI.enable_u ~= 0;
-else enable_u = enable_u ~= 0 end
-if type(PI.enable_d) == "boolean" then enable_d = PI.enable_d;
-elseif type(PI.enable_d) == "number" then enable_d = PI.enable_d ~= 0;
-else enable_d = enable_d ~= 0 end
-if type(PI.enable_l) == "boolean" then enable_l = PI.enable_l;
-elseif type(PI.enable_l) == "number" then enable_l = PI.enable_l ~= 0;
-else enable_l = enable_l ~= 0 end
-if type(PI.enable_r) == "boolean" then enable_r = PI.enable_r;
-elseif type(PI.enable_r) == "number" then enable_r = PI.enable_r ~= 0;
-else enable_r = enable_r ~= 0 end
+enable_u = as_bool(PI.enable_u, enable_u);
+enable_d = as_bool(PI.enable_d, enable_d);
+enable_l = as_bool(PI.enable_l, enable_l);
+enable_r = as_bool(PI.enable_r, enable_r);
 thresh = tonumber(PI.thresh) or thresh;
-if type(PI.move_center) == "boolean" then move_center = PI.move_center;
-elseif type(PI.move_center) == "number" then move_center = PI.move_center ~= 0;
-else move_center = move_center ~= 0 end
+move_center = as_bool(PI.move_center, move_center);
 
 -- normalize paramters.
 pad_u = math.floor(0.5 + pad_u);
@@ -120,7 +115,7 @@ if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then return dismiss() end
 if enable_u or enable_d or enable_l or enable_r then
 	-- prepare for shaders.
 	-- NOTE: getpixel(x, y, "col") で返されるアルファ値は 1 / 255 刻み．
-	obj.setoption("drawtarget", "tempbuffer", w + h, 1);
+	obj.clearbuffer("tempbuffer", w + h, 1);
 	obj.pixelshader("find_max", "tempbuffer", "object", { w, h, thresh });
 	local data = obj.getpixeldata("tempbuffer");
 	local ptr = ffi.cast("uint8_t*", data) + 3;
@@ -162,8 +157,7 @@ end
 -- crop / pad the image.
 if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then return dismiss();
 elseif w + pad_l <= 0 or w + pad_r <= 0 or h + pad_u <= 0 or h + pad_d <= 0 then
-	obj.setoption("drawtarget", "tempbuffer", w + pad_l + pad_r, h + pad_u + pad_d);
-	obj.copybuffer("object", "tempbuffer");
+	obj.copybuffer("object", w + pad_l + pad_r, h + pad_u + pad_d);
 else
 	local U, D, L, R = pad_u, pad_d, pad_l, pad_r;
 	while U < 0 or D < 0 or L < 0 or R < 0 do
