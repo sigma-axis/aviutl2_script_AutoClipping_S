@@ -1,4 +1,4 @@
-# AutoClipping_S AviUtl ExEdit2 余白除去スクリプト
+# 余白除去スクリプト AutoClipping_S
 
 オブジェクトの不透明ピクセルを検索して，最小サイズなるよう上下左右端をクリッピングする AviUtl ExEdit 2 用のスクリプトです．
 
