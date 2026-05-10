@@ -14,7 +14,7 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta43a` で動作確認済み．
+  - `beta44` で動作確認済み．
 
 ##  導入方法
 
@@ -96,6 +96,13 @@ Although, usage documentations for this script / plugin in languages other than 
 
   実装手順もコードも元のものとは全く異なりますが，根本的な設計は同じです．礎となったスクリプトを開発してくださった Mr-Ojii 様には改めて感謝申し上げます．
 
+
+##  次の改版予定
+
+- **v1.15 (for beta44)** (2026-??-??)
+
+  - 一時バッファとして仮想バッファ (`"tempbuffer"`) を使用しないように変更．
+  - AviUtl2 `beta44` での動作確認．
 
 ##  改版履歴
 

@@ -1,3 +1,4 @@
+-- under development for v1.15.
 --[[
 MIT License
 Copyright (c) 2025 sigma-axis
@@ -117,12 +118,12 @@ if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then return dismiss() end
 if enable_u or enable_d or enable_l or enable_r then
 	-- prepare for shaders.
 	-- NOTE: getpixel(x, y, "col") で返されるアルファ値は 1 / 255 刻み．
-	local image_max = 2 ^ 14; -- obj.getinfo("image_max");
-	obj.clearbuffer("tempbuffer",
+	local cache_name, image_max = "cache:auto_clipping_s/stat", 2 ^ 14; -- obj.getinfo("image_max").
+	obj.clearbuffer(cache_name,
 		w + h > image_max and math.ceil((w + h) / 2) or (w + h),
 		w + h > image_max and 2 or 1);
-	obj.pixelshader("find_max", "tempbuffer", "object", { w, h, thresh });
-	local data = obj.getpixeldata("tempbuffer");
+	obj.pixelshader("find_max", cache_name, "object", { w, h, thresh });
+	local data = obj.getpixeldata(cache_name);
 	local ptr = ffi.cast("uint8_t*", data) + 3;
 
 	-- find left and right.
