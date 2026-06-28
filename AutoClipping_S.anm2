@@ -162,7 +162,7 @@ end
 -- crop / pad the image.
 if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then return dismiss();
 elseif w + pad_l <= 0 or w + pad_r <= 0 or h + pad_u <= 0 or h + pad_d <= 0 then
-	obj.copybuffer("object", w + pad_l + pad_r, h + pad_u + pad_d);
+	obj.clearbuffer("object", w + pad_l + pad_r, h + pad_u + pad_d);
 else
 	local U, D, L, R = pad_u, pad_d, pad_l, pad_r;
 	while U < 0 or D < 0 or L < 0 or R < 0 do
