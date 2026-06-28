@@ -14,7 +14,7 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta45` で動作確認済み．
+  - `beta52` で動作確認済み．
 
 ##  導入方法
 
@@ -98,6 +98,11 @@ Although, usage documentations for this script / plugin in languages other than 
 
 
 ##  改版履歴
+
+- **v1.16 (for beta52)** (2026-06-28)
+
+  - 「上除去」「下除去」「左除去」「右除去」のどれかが負方向に大きくて，元画像の枠からはみ出て完全透明になった場合，スクリプトエラーになることがあったのを修正．
+  - AviUtl2 `beta52` での動作確認．
 
 - **v1.15 (for beta45)** (2026-05-10)
 
