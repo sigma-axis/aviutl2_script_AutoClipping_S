@@ -29,8 +29,8 @@ jobs:
       - name: Set package version
         run: |
           cd assets
-          $ver='${{ github.ref_name }}'
-          $ver_name=$(printf '%s' "$ver" | sed -E 's/^([^-]*)-(.*)$/\1 (\2)/; s/-/ /g')
+          ver="${{ github.ref_name }}"
+          ver_name=$(printf '%s' "$ver" | sed -E 's/^([^-]*)-(.*)$/\1 (\2)/; s/-/ /g')
           sed -i 's/\${ver}/'"$ver_name"'/g' package.ini
 
       - name: Pack and compress
