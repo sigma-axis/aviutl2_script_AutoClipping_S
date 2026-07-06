@@ -22,7 +22,7 @@ SOFTWARE.
 
 https://mit-license.org/
 ]]
---information:AutoClipping_S v1.17-wip (for beta53a) by σ軸
+--information:AutoClipping_S v1.17 (for beta53a) by σ軸
 --label:クリッピング
 --require:2004101
 --track@thresh:αしきい値,0,100,0,0.01

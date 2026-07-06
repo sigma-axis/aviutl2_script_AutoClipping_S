@@ -97,14 +97,13 @@ Although, usage documentations for this script / plugin in languages other than 
   実装手順もコードも元のものとは全く異なりますが，根本的な設計は同じです．礎となったスクリプトを開発してくださった Mr-Ojii 様には改めて感謝申し上げます．
 
 
-##  次の改版予定
+##  改版履歴
 
-- **v1.17 (for beta53a)** (2026-??-??)
+- **v1.17 (for beta53a)** (2026-07-07)
 
   - 高さが 4001 ピクセル以上の完全透明画像が正しく処理できていなかったのを修正．
   - AviUtl2 `beta53a` での動作確認．
-
-##  改版履歴
+  - AviUtl2 一周年おめでとう！
 
 - **v1.16 (for beta52)** (2026-06-28)
 
