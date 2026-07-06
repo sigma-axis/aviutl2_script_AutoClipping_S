@@ -1,6 +1,6 @@
 --[[
 MIT License
-Copyright (c) 2025 sigma-axis
+Copyright (c) 2025-2026 sigma-axis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,9 @@ SOFTWARE.
 
 https://mit-license.org/
 ]]
---information:AutoClipping_S v1.16 (for beta52) by σ軸
+--information:AutoClipping_S v1.17-wip (for beta53a) by σ軸
 --label:クリッピング
---require:2003801
+--require:2004101
 --track@thresh:αしきい値,0,100,0,0.01
 --check@move_center:中心の位置を変更,false
 --group:余白,false
@@ -105,13 +105,9 @@ thresh = math.min(math.max(thresh / 100, 0), 1 - 2 ^ -24);
 
 -- early return for obvious cases.
 local w, h = obj.w, obj.h;
-local function dismiss()
-	-- the entire image is dismissed.
-	obj.effect("クリッピング", "中心の位置を変更", 1, "下", h);
-end
 if not (enable_u or enable_d or enable_l or enable_r) and
 	(pad_u == 0 and pad_d == 0 and pad_l == 0 and pad_r == 0) then return end
-if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then return dismiss() end
+if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then obj.load("text", ""); return end
 
 -- find boudaries.
 if enable_u or enable_d or enable_l or enable_r then
@@ -131,7 +127,7 @@ if enable_u or enable_d or enable_l or enable_r then
 		for x = 0, w - 1 do
 			if ptr[4 * x] > 0 then l = x; break end
 		end
-		if not l then return dismiss() end
+		if not l then obj.load("text", ""); return end
 		r = l;
 		for x = w - 1, l + 1, -1 do
 			if ptr[4 * x] > 0 then r = x; break end
@@ -145,7 +141,7 @@ if enable_u or enable_d or enable_l or enable_r then
 		for y = 0, h - 1 do
 			if ptr[4 * y] > 0 then u = y; break end
 		end
-		if not u then return dismiss() end
+		if not u then obj.load("text", ""); return end
 		d = u;
 		for y = h - 1, u + 1, -1 do
 			if ptr[4 * y] > 0 then d = y; break end
@@ -160,7 +156,7 @@ if enable_u or enable_d or enable_l or enable_r then
 end
 
 -- crop / pad the image.
-if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then return dismiss();
+if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then obj.load("text", ""); return;
 elseif w + pad_l <= 0 or w + pad_r <= 0 or h + pad_u <= 0 or h + pad_d <= 0 then
 	obj.clearbuffer("object", w + pad_l + pad_r, h + pad_u + pad_d);
 else
