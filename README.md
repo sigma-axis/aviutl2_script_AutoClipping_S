@@ -33,18 +33,6 @@ Although, usage documentations for this script / plugin in languages other than 
 
 ##  パラメタの説明
 
-### 上余白 / 下余白 / 左余白 / 右余白
-
-上下左右それぞれの余白幅を指定します．負値を指定するとさらにクリッピングします．
-
-全てピクセル単位で最小値は -4000, 最大値は 4000, 初期値は 0.
-
-### 上除去 / 下除去 / 左除去 / 右除去
-
-上下左右それぞれで，透明ピクセルを除去するかどうかを個別に指定します．
-
-初期値は全て ON.
-
 ### αしきい値
 
 各ピクセルを「不透明」と判断する，アルファ値のしきい値です．このしきい値以下のピクセルは「透明」，しきい値を超えるピクセルは「不透明」とみなされます．
@@ -59,12 +47,26 @@ Although, usage documentations for this script / plugin in languages other than 
 
 初期値は ON.
 
+### 上余白 / 下余白 / 左余白 / 右余白
+
+上下左右それぞれの余白幅を指定します．負値を指定するとさらにクリッピングします．
+
+全てピクセル単位で最小値は -4000, 最大値は 4000, 初期値は 0.
+
+### 上除去 / 下除去 / 左除去 / 右除去
+
+上下左右それぞれで，透明ピクセルを除去するかどうかを個別に指定します．
+
+初期値は全て ON.
+
 ### `PI`
 
 パラメタインジェクション (parameter injection) です．初期値は空欄. テーブル型の中身として解釈され，各種パラメタの代替値として使用されます．また，任意のスクリプトコードを実行する記述領域にもなります．
 
 ```lua
 {
+  thresh = num,       -- number 型で "αしきい値" の項目を上書き，または nil.
+  move_center = bool, -- boolean 型で "中心の位置を変更" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
   pad_u = num,        -- number 型で "上余白" の項目を上書き，または nil.
   pad_d = num,        -- number 型で "下余白" の項目を上書き，または nil.
   pad_l = num,        -- number 型で "左余白" の項目を上書き，または nil.
@@ -73,8 +75,6 @@ Although, usage documentations for this script / plugin in languages other than 
   enable_d = bool,    -- boolean 型で "下除去" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
   enable_l = bool,    -- boolean 型で "左除去" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
   enable_r = bool,    -- boolean 型で "右除去" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
-  thresh = num,       -- number 型で "αしきい値" の項目を上書き，または nil.
-  move_center = bool, -- boolean 型で "中心の位置を変更" の項目を上書き，または nil. 0 を false, 0 以外を true 扱いとして number 型も可能．
 }
 ```
 - テキストボックスには冒頭末尾の波括弧 (`{}`) を省略して記述してください．

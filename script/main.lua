@@ -37,6 +37,8 @@ local enable_r = true
 --group:その他,false
 ---$nolang: name
 ---$tips:PI = {
+---     :  thresh: number?,
+---     :  move_center: boolean|number|nil,
 ---     :  pad_u: number?,
 ---     :  pad_d: number?,
 ---     :  pad_l: number?,
@@ -45,8 +47,6 @@ local enable_r = true
 ---     :  enable_d: boolean|number|nil,
 ---     :  enable_l: boolean|number|nil,
 ---     :  enable_r: boolean|number|nil,
----     :  thresh: number?,
----     :  move_center: boolean|number|nil,
 ---     :}
 ---$value:PI
 local PI = {}
