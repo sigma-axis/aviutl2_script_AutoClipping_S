@@ -5,7 +5,7 @@
 ---$track:αしきい値, min = 0, max = 100, step = 0.01
 local thresh = 0
 
----$check:中心の位置を変更
+---$checksection:中心の位置を変更
 local move_center = false
 
 --group:余白,false
@@ -22,16 +22,16 @@ local pad_l = 0
 local pad_r = 0
 
 --group:有効無効,false
----$check:上除去
+---$checksection:上除去
 local enable_u = true
 
----$check:下除去
+---$checksection:下除去
 local enable_d = true
 
----$check:左除去
+---$checksection:左除去
 local enable_l = true
 
----$check:右除去
+---$checksection:右除去
 local enable_r = true
 
 --group:その他,false

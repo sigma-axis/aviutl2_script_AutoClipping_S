@@ -102,7 +102,7 @@ Although, usage documentations for this script / plugin in languages other than 
 - **v1.20** (2026-??-??)
 
   - 一部設定項目にツールチップを追加．
-  - コード整理．
+  - 各種チェックボックスの設定項目を，中間点区間ごとに可変なものに変更．
 
 ##  改版履歴
 
