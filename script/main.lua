@@ -1,87 +1,64 @@
---[[
-MIT License
-Copyright (c) 2025-2026 sigma-axis
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-https://mit-license.org/
-]]
---information:AutoClipping_S v1.18-TEST by σ軸
+--information:AutoClipping_S ${PACKAGE_VERSION} by ${AUTHOR}
+---$script_tips:オブジェクトの不透明ピクセルを含む最小サイズなるように，上下左右端をクリッピングします．
 --label:クリッピング
---require:2004101
---track@thresh:αしきい値,0,100,0,0.01
---check@move_center:中心の位置を変更,false
---group:余白,false
---track@pad_u:上余白,-4000,4000,0,1,,0.05
---track@pad_d:下余白,-4000,4000,0,1,,0.05
---track@pad_l:左余白,-4000,4000,0,1,,0.05
---track@pad_r:右余白,-4000,4000,0,1,,0.05
---group:有効無効,false
---check@enable_u:上除去,true
---check@enable_d:下除去,true
---check@enable_l:左除去,true
---check@enable_r:右除去,true
---group:その他,false
---value@PI:PI,{}
---[[pixelshader@find_minmax:
-Texture2D src : register(t0);
-cbuffer constant0 : register(b0) {
-	float width, thresh;
-};
-static const uint w = uint(width);
+--require:${LEAST_AVIUTL_VERSION}
+---$track:αしきい値, min = 0, max = 100, step = 0.01
+local thresh = 0
 
-float4 find_minmax(float4 pos : SV_Position) : SV_Target
-{
-	const uint y = uint(pos.x);
-	int pos_min = int(w), pos_max = -1;
-	for (uint x = 0; x < w; x++) {
-		if (thresh < src[uint2(x, y)].a) {
-			pos_min = min(pos_min, int(x));
-			pos_max = max(pos_max, int(x));
-		}
-	}
-	if (pos_max < 0) return 0;
-	const float4 c = uint4(
-		pos_min & 0xff,
-		(pos_min >> 8) & 0x7f,
-		pos_max & 0xff,
-		0x80 | ((pos_max >> 8) & 0x7f)) / 255.0;
-	return float4(c.a * c.rgb, c.a);
-}
+---$check:中心の位置を変更
+local move_center = false
+
+--group:余白,false
+---$track:上余白, min = -4000, max = 4000, step = 1, scale = 0.05
+local pad_u = 0
+
+---$track:下余白, min = -4000, max = 4000, step = 1, scale = 0.05
+local pad_d = 0
+
+---$track:左余白, min = -4000, max = 4000, step = 1, scale = 0.05
+local pad_l = 0
+
+---$track:右余白, min = -4000, max = 4000, step = 1, scale = 0.05
+local pad_r = 0
+
+--group:有効無効,false
+---$check:上除去
+local enable_u = true
+
+---$check:下除去
+local enable_d = true
+
+---$check:左除去
+local enable_l = true
+
+---$check:右除去
+local enable_r = true
+
+--group:その他,false
+---$nolang: name
+---$tips:PI = {
+---     :  pad_u: number?,
+---     :  pad_d: number?,
+---     :  pad_l: number?,
+---     :  pad_r: number?,
+---     :  enable_u: boolean|number|nil,
+---     :  enable_d: boolean|number|nil,
+---     :  enable_l: boolean|number|nil,
+---     :  enable_r: boolean|number|nil,
+---     :  thresh: number?,
+---     :  move_center: boolean|number|nil,
+---     :}
+---$value:PI
+local PI = {}
+
+--[[pixelshader@find_minmax:
+---$include "find_minmax.hlsl"
 ]]
 local obj, math, tonumber, type, ffi = obj, math, tonumber, type, require("ffi");
 
+--#region PI / normalize parameters.
+
 -- take parameters.
---[==[
-	PI = {
-		pad_u: number?,
-		pad_d: number?,
-		pad_l: number?,
-		pad_r: number?,
-		enable_u: boolean|number|nil,
-		enable_d: boolean|number|nil,
-		enable_l: boolean|number|nil,
-		enable_r: boolean|number|nil,
-		thresh: number?,
-		move_center: boolean|number|nil,
-	}
---]==]
 local function as_bool(t, v)
 	if type(t) == "boolean" then return t;
 	elseif type(t) == "number" then return t ~= 0;
@@ -105,6 +82,8 @@ pad_l = math.floor(0.5 + pad_l);
 pad_r = math.floor(0.5 + pad_r);
 thresh = math.min(math.max(thresh / 100, 0), 1 - 2 ^ -24);
 
+--#endregion PI / normalize parameters.
+
 -- early return for obvious cases.
 local w, h = obj.w, obj.h;
 if not (enable_u or enable_d or enable_l or enable_r) and
@@ -114,7 +93,6 @@ if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then obj.load("text", ""); r
 -- find boudaries.
 if enable_u or enable_d or enable_l or enable_r then
 	-- prepare for shaders.
-	-- NOTE: getpixel(x, y, "col") で返されるアルファ値は 1 / 255 刻み．
 	local cache_name = "cache:auto_clipping_s/stat";
 	obj.clearbuffer(cache_name, h, 1);
 	obj.pixelshader("find_minmax", cache_name, "object", { w, thresh });

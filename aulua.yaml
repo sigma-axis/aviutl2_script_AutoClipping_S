@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/karoterra/aviutl2-aulua/refs/heads/main/schema/aulua.schema.json
+project:
+  variables:
+    NAME: AutoClipping_S
+    AUTHOR: σ軸
+    PUBLISH_PAGE: https://github.com/sigma-axis/aviutl2_script_AutoClipping_S
+    LEAST_AVIUTL_VERSION: "2005400"
+    LEAST_AVIUTL_VERSION_STRING: 2.0.54
+
+package:
+  id: AutoClipping_S
+  name: 余白除去スクリプト AutoClipping_S
+  version: v1.20-wip
+  information: "{name} {version} by {AUTHOR}"
+  script_sub_dir: ""
+  uninstall_sub_folder_file: false
+  message:
+    text: |
+      # 余白除去スクリプト AutoClipping_S
+
+      オブジェクトの不透明ピクセルを検索して，最小サイズなるよう上下左右端をクリッピングする AviUtl ExEdit 2 用のスクリプトです．
+
+      公開ページ:
+      https://github.com/sigma-axis/aviutl2_script_AutoClipping_S
+
+  assets:
+    - src: README.md
+      dest: Script/{id}/README.md
+    - src: LICENSE
+      dest: Script/{id}/LICENSE
+  file_name: package.au2pkg.zip
+
+build:
+  out_dir: build
+
+scripts:
+  - name: AutoClipping_S.anm2
+    sources:
+      - path: script/preamble.lua
+      - path: script/main.lua
+
+language:
+  files:
+    - path: build/Default.AutoClipping_S.aul2
+      text: false
+      tooltip: true

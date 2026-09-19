@@ -99,8 +99,9 @@ Although, usage documentations for this script / plugin in languages other than 
 
 ##  次の改版予定
 
-- **v1.18** (2026-??-??)
+- **v1.20** (2026-??-??)
 
+  - 一部設定項目にツールチップを追加．
   - コード整理．
 
 ##  改版履歴
