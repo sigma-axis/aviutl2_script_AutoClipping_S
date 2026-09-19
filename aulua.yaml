@@ -5,12 +5,12 @@ project:
     AUTHOR: σ軸
     PUBLISH_PAGE: https://github.com/sigma-axis/aviutl2_script_AutoClipping_S
     LEAST_AVIUTL_VERSION: "2005400"
-    LEAST_AVIUTL_VERSION_STRING: 2.0.54
+    LEAST_AVIUTL_VERSION_STRING: "2.0.54"
 
 package:
   id: AutoClipping_S
   name: 余白除去スクリプト AutoClipping_S
-  version: v1.20-wip
+  version: v1.20
   information: "{name} {version} by {AUTHOR}"
   script_sub_dir: ""
   uninstall_sub_folder_file: false
