@@ -1,6 +1,6 @@
 ; Tooltip definitions
 ;===============================================================
-; Target: Basic_S (https://github.com/sigma-axis/aviutl2_script_AutoClipping_S)
+; Target: AutoClipping_S (https://github.com/sigma-axis/aviutl2_script_AutoClipping_S)
 ; Target Version: ${ver}
 ; Language: Default
 
