@@ -86,8 +86,6 @@ thresh = math.min(math.max(thresh / 100, 0), 1 - 2 ^ -24);
 
 -- early return for obvious cases.
 local w, h = obj.w, obj.h;
-if not (enable_u or enable_d or enable_l or enable_r) and
-	(pad_u == 0 and pad_d == 0 and pad_l == 0 and pad_r == 0) then return end
 if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then obj.load("text", ""); return end
 
 -- find boudaries.
@@ -99,18 +97,17 @@ if enable_u or enable_d or enable_l or enable_r then
 	local data = obj.getpixeldata(cache_name);
 	local ptr = ffi.cast("uint32_t*", data);
 
-	-- find top and bottom.
-	local l, r, u, d = w, -1, h, -1;
+	-- find the four edges.
+	local u, d, l, r = h - 1, -1, w - 1, 2 ^ 31;
 	for y = 0, h - 1 do
 		local v = ptr[y];
 		if v >= 2 ^ 31 then
-			v = v - 2 ^ 31;
-			local m, M = v % 2 ^ 16, math.floor(v / 2 ^ 16);
-			l, r = math.min(l, m), math.max(r, M);
 			u, d = math.min(u, y) , math.max(d, y);
+			l, r = math.min(l, v % 2 ^ 16), math.max(r, v);
 		end
 	end
-	if r < 0 then obj.load("text", ""); return end
+	if d < 0 then obj.load("text", ""); return end
+	r = math.min(math.max(math.floor((r - 2 ^ 31) / 2 ^ 16), l), w - 1);
 
 	-- calculate the amount to crop / pad.
 	if enable_u then pad_u = pad_u - u end
@@ -118,6 +115,7 @@ if enable_u or enable_d or enable_l or enable_r then
 	if enable_l then pad_l = pad_l - l end
 	if enable_r then pad_r = pad_r - (w - (r + 1)) end
 end
+if pad_u == 0 and pad_d == 0 and pad_l == 0 and pad_r == 0 then return end
 
 -- crop / pad the image.
 if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then obj.load("text", ""); return;
