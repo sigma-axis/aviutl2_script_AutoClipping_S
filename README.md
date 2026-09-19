@@ -14,7 +14,7 @@ Mr-Ojii 様の [AutoClipping_M](https://github.com/Mr-Ojii/AviUtl-AutoClipping_M
 
   http://spring-fragrance.mints.ne.jp/aviutl
 
-  - `beta53a` で動作確認済み．
+  - `2.1.9` で動作確認済み．
 
 ##  導入方法
 
@@ -96,6 +96,12 @@ Although, usage documentations for this script / plugin in languages other than 
 
   実装手順もコードも元のものとは全く異なりますが，根本的な設計は同じです．礎となったスクリプトを開発してくださった Mr-Ojii 様には改めて感謝申し上げます．
 
+
+##  次の改版予定
+
+- **v1.18** (2026-??-??)
+
+  - コード整理．
 
 ##  改版履歴
 

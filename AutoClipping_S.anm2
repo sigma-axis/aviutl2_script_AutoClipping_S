@@ -22,7 +22,7 @@ SOFTWARE.
 
 https://mit-license.org/
 ]]
---information:AutoClipping_S v1.17 (for beta53a) by σ軸
+--information:AutoClipping_S v1.18-TEST by σ軸
 --label:クリッピング
 --require:2004101
 --track@thresh:αしきい値,0,100,0,0.01
@@ -39,28 +39,30 @@ https://mit-license.org/
 --check@enable_r:右除去,true
 --group:その他,false
 --value@PI:PI,{}
---[[pixelshader@find_max:
+--[[pixelshader@find_minmax:
 Texture2D src : register(t0);
 cbuffer constant0 : register(b0) {
-	float width, height, thresh;
+	float width, thresh;
 };
-static const int w = int(width), h = int(height), stride = (w + h + 1) >> 1;
+static const uint w = uint(width);
 
-float4 find_max(float4 pos : SV_Position) : SV_Target
+float4 find_minmax(float4 pos : SV_Position) : SV_Target
 {
-	float M = 0;
-	const int i = int(pos.x) + int(pos.y) * stride;
-	[branch] if (i < width) {
-		const int x = i;
-		for (int y = 0; y < h; y++)
-			M = max(M, src.Load(int3(x, y, 0)).a);
+	const uint y = uint(pos.x);
+	int pos_min = int(w), pos_max = -1;
+	for (uint x = 0; x < w; x++) {
+		if (thresh < src[uint2(x, y)].a) {
+			pos_min = min(pos_min, int(x));
+			pos_max = max(pos_max, int(x));
+		}
 	}
-	else {
-		const int y = i - w;
-		for (int x = 0; x < w; x++)
-			M = max(M, src.Load(int3(x, y, 0)).a);
-	}
-	return float4(0.0, 0.0, 0.0, thresh < M ? 1 : 0);
+	if (pos_max < 0) return 0;
+	const float4 c = uint4(
+		pos_min & 0xff,
+		(pos_min >> 8) & 0x7f,
+		pos_max & 0xff,
+		0x80 | ((pos_max >> 8) & 0x7f)) / 255.0;
+	return float4(c.a * c.rgb, c.a);
 }
 ]]
 local obj, math, tonumber, type, ffi = obj, math, tonumber, type, require("ffi");
@@ -113,40 +115,24 @@ if w + pad_l + pad_r <= 0 or h + pad_u + pad_d <= 0 then obj.load("text", ""); r
 if enable_u or enable_d or enable_l or enable_r then
 	-- prepare for shaders.
 	-- NOTE: getpixel(x, y, "col") で返されるアルファ値は 1 / 255 刻み．
-	local cache_name, image_max = "cache:auto_clipping_s/stat", 2 ^ 14; -- obj.getinfo("image_max").
-	obj.clearbuffer(cache_name,
-		w + h > image_max and math.ceil((w + h) / 2) or (w + h),
-		w + h > image_max and 2 or 1);
-	obj.pixelshader("find_max", cache_name, "object", { w, h, thresh });
+	local cache_name = "cache:auto_clipping_s/stat";
+	obj.clearbuffer(cache_name, h, 1);
+	obj.pixelshader("find_minmax", cache_name, "object", { w, thresh });
 	local data = obj.getpixeldata(cache_name);
-	local ptr = ffi.cast("uint8_t*", data) + 3;
-
-	-- find left and right.
-	local l, r;
-	if enable_l or enable_r then
-		for x = 0, w - 1 do
-			if ptr[4 * x] > 0 then l = x; break end
-		end
-		if not l then obj.load("text", ""); return end
-		r = l;
-		for x = w - 1, l + 1, -1 do
-			if ptr[4 * x] > 0 then r = x; break end
-		end
-	else l, r = 0, w - 1 end
+	local ptr = ffi.cast("uint32_t*", data);
 
 	-- find top and bottom.
-	local u, d;
-	if enable_u or enable_d then
-		ptr = ptr + 4 * w
-		for y = 0, h - 1 do
-			if ptr[4 * y] > 0 then u = y; break end
+	local l, r, u, d = w, -1, h, -1;
+	for y = 0, h - 1 do
+		local v = ptr[y];
+		if v >= 2 ^ 31 then
+			v = v - 2 ^ 31;
+			local m, M = v % 2 ^ 16, math.floor(v / 2 ^ 16);
+			l, r = math.min(l, m), math.max(r, M);
+			u, d = math.min(u, y) , math.max(d, y);
 		end
-		if not u then obj.load("text", ""); return end
-		d = u;
-		for y = h - 1, u + 1, -1 do
-			if ptr[4 * y] > 0 then d = y; break end
-		end
-	else u, d = 0, h - 1 end
+	end
+	if r < 0 then obj.load("text", ""); return end
 
 	-- calculate the amount to crop / pad.
 	if enable_u then pad_u = pad_u - u end
